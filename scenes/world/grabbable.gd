@@ -4,7 +4,6 @@ extends RigidBody3D
 @export var mesh : MeshInstance3D
 @export var collision_shape : CollisionShape3D
 @onready var bounds: Node3D = $Bounds # the points are named NNN (Negative X, Negative Y, Negative Z), NNP (-X, -Y, +Z), NPN, NPP, etc.
-var bounds_hover_tween : Tween
 
 @export var grab_stiffness : float = 20.0
 @export var grab_damping : float = 30.0
@@ -12,19 +11,30 @@ var bounds_hover_tween : Tween
 @export var maintain_upright : bool = false
 @export var upright_torque_strength : float = 10.0
 
+var bounds_hover_tween : Tween
 var is_grabbed : bool = false
 var grab_target_position : Vector3
 var grab_target_rotation : Basis
 var grab_anchor : Node3D
+var noise_tween : Tween
 
 var original_gravity_scale : float
 
+const GRABBED_MATERIAL = preload("uid://coc4737377k3b")
+
 func _ready():
 	_position_bounds()
+	mesh.material_overlay = GRABBED_MATERIAL.duplicate()
+	mesh.material_overlay.set_local_to_scene(true)
+	mesh.material_overlay.set_shader_parameter("alpha", 0.0)
 	original_gravity_scale = gravity_scale
 
 func _set_grab_vfx(enable: bool) -> void:
-	pass
+	mesh.material_overlay.set_shader_parameter("alpha", 1.0 if enable else 0.0)
+	if noise_tween: noise_tween.kill()
+	if enable:
+		noise_tween = create_tween()
+		noise_tween.tween_method(_set_shader_value, 1.0, 0.0, 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 
 func _set_hover_vfx(enable: bool) -> void:
 	if enable:
@@ -118,6 +128,9 @@ func _apply_position_force(_delta: float) -> void:
 		force = force.normalized() * max_grab_force
 
 	apply_central_force(force)
+
+func _set_shader_value(value: float):
+	mesh.material_overlay.set_shader_parameter("noise_override", value);
 
 func _apply_rotation_force(_delta: float) -> void:
 	if not maintain_upright:

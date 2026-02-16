@@ -8,8 +8,8 @@ radius = 0.45
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ntlox"]
 bg_color = Color(1, 1, 1, 1)
-shadow_color = Color(0, 0, 0, 0.7529412)
-shadow_size = 1
+shadow_color = Color(0, 0, 0, 0.90588236)
+shadow_size = 2
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_unmdi"]
 render_priority = 0
@@ -35,18 +35,10 @@ shape = SubResource("CapsuleShape3D_umfxx")
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=116403732]
 
-[node name="Panel" type="Panel" parent="HUD" unique_id=636990591]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -1.0
-offset_top = -1.0
-offset_right = 1.0
-offset_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Crosshair" type="Panel" parent="HUD" unique_id=636990591]
+offset_right = 4.0
+offset_bottom = 4.0
+pivot_offset = Vector2(2, 2)
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ntlox")
 
@@ -56,6 +48,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 [node name="CamContainer" type="Node3D" parent="Head" unique_id=2043748828]
 
 [node name="Camera3D" type="Camera3D" parent="Head/CamContainer" unique_id=1133739601]
+fov = 179.0
 
 [node name="DepthMarkerQuad" type="MeshInstance3D" parent="Head/CamContainer/Camera3D" unique_id=1684351054]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4434595, -4.502241, 22.231209)

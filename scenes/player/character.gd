@@ -35,7 +35,10 @@ var display_health := max_health
 
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/CamContainer/Camera3D
+@onready var crosshair: Panel = $HUD/Crosshair
+
 @onready var grab_raycast: ShapeCast3D = $Head/CamContainer/Camera3D/GrabRaycast
+@onready var root := get_tree().root
 
 var mouse_input : Vector2
 var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -46,6 +49,8 @@ var air_time := 0.0
 
 var grab_target : Grabbable3D
 var grabbing := false
+
+var crosshair_position : Vector2
 
 func _ready() -> void:
 	var config := ConfigFile.new()
@@ -151,6 +156,7 @@ func _physics_process(delta: float) -> void:
 			grab_target._set_hover_vfx(false)
 			if throw:
 				var dir = -camera.global_transform.basis.z
+				#grab_target.apply_central_impulse(dir * throw_impulse + get_real_velocity())
 				grab_target.linear_velocity = dir * throw_impulse + get_real_velocity()
 		grab_target = null
 
@@ -163,10 +169,12 @@ func _physics_process(delta: float) -> void:
 
 	fov_mod = clampf(tangent_speed * 4 / base_speed, 0, 5)
 
-	mouse_sensitivity_ratio = float(get_tree().root.size.x) / float(get_tree().root.content_scale_size.x)
+	mouse_sensitivity_ratio = float(root.size.x) / float(root.content_scale_size.x)
+	crosshair_position = (Vector2(root.content_scale_size) / 2.0) if !grab_target or grabbing else camera.unproject_position(grab_target.global_position)
 
 	was_on_floor = is_on_floor()
 	move_and_slide()
 
 func _process(_delta: float) -> void:
+	crosshair.position = lerp(crosshair.position, crosshair_position, _delta * 20.0)
 	_handle_head_rotation()
