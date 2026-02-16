@@ -8,6 +8,7 @@ extends CharacterBody3D
 @export var jump_velocity := 5.5
 @export var in_air_speed_rate := 0.35
 @export var mouse_sensitivity := 0.05
+@export var mouse_sensitivity_ratio : float
 
 @export var max_health := 100.0
 @export var health := max_health
@@ -26,9 +27,15 @@ var display_health := max_health
 		fov_mod = value
 		camera.fov = target_fov + fov_mod
 
+@export var hold_distance : float = 4.0
+@export var min_hold_dist : float = 1.5
+@export var max_hold_dist : float = 8.0
+
+@export var throw_impulse : float = 30.0
+
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/CamContainer/Camera3D
-@onready var grab_raycast: RayCast3D = $Head/CamContainer/Camera3D/GrabRaycast
+@onready var grab_raycast: ShapeCast3D = $Head/CamContainer/Camera3D/GrabRaycast
 
 var mouse_input : Vector2
 var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -37,7 +44,8 @@ var current_speed : float = 0.0
 var tangent_speed : float = 0.0
 var air_time := 0.0
 
-
+var grab_target : Grabbable3D
+var grabbing := false
 
 func _ready() -> void:
 	var config := ConfigFile.new()
@@ -80,8 +88,8 @@ func _unhandled_input(event : InputEvent) -> void:
 			Input.MOUSE_MODE_VISIBLE:
 				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		mouse_input.x += event.relative.x
-		mouse_input.y += event.relative.y
+		mouse_input.x += event.relative.x * mouse_sensitivity_ratio
+		mouse_input.y += event.relative.y * mouse_sensitivity_ratio
 
 func on_damage(damage: float) -> void:
 	health -= damage
@@ -102,7 +110,6 @@ func _physics_process(delta: float) -> void:
 	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		input_dir = Input.get_vector("left", "right", "forward", "back")
 
-	_handle_head_rotation()
 	_handle_movement(delta, input_dir)
 	_handle_jumping()
 
@@ -118,7 +125,48 @@ func _physics_process(delta: float) -> void:
 			#jump_anim.play("land")
 		air_time = 0.0
 
+	if !grabbing:
+		if grab_raycast.is_colliding() and (!grab_target or grab_target.get_instance_id() != grab_raycast.get_collider(0).get_instance_id()) and grab_raycast.get_collider(0) is Grabbable3D:
+			if grab_target: grab_target._set_hover_vfx(false)
+			grab_target = grab_raycast.get_collider(0)
+			grab_target._set_hover_vfx(true)
+		elif !grab_raycast.is_colliding() and grab_target:
+			grab_target._set_hover_vfx(false)
+			grab_target = null
+
+	if Input.is_action_just_pressed("grab") and !grabbing and grab_target:
+		grabbing = true
+		#hold_distance = camera.global_position.distance_to(grab_raycast.get_collision_point()) - 0.5
+		hold_distance = 3.0
+		grab_target.start_grab(self)
+
+	#hold_distance = clamp(hold_distance, min_hold_dist, max_hold_dist)
+
+	var throw := Input.is_action_just_pressed("throw")
+
+	if grabbing and (Input.is_action_just_released("grab") or !is_instance_valid(grab_target) or throw):
+		grabbing = false
+		if is_instance_valid(grab_target):
+			grab_target.stop_grab()
+			grab_target._set_hover_vfx(false)
+			if throw:
+				var dir = -camera.global_transform.basis.z
+				grab_target.linear_velocity = dir * throw_impulse + get_real_velocity()
+		grab_target = null
+
+	if grabbing:
+		var origin = camera.global_transform.origin
+		var forward = -camera.global_transform.basis.z
+		var target_pos = origin + forward * hold_distance
+
+		grab_target.set_grab_target(target_pos, camera.global_transform.basis)
+
 	fov_mod = clampf(tangent_speed * 4 / base_speed, 0, 5)
+
+	mouse_sensitivity_ratio = float(get_tree().root.size.x) / float(get_tree().root.content_scale_size.x)
 
 	was_on_floor = is_on_floor()
 	move_and_slide()
+
+func _process(_delta: float) -> void:
+	_handle_head_rotation()

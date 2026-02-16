@@ -63,6 +63,5 @@ mesh = SubResource("QuadMesh_p42bw")
 
 [node name="GrabRaycast" type="ShapeCast3D" parent="Head/CamContainer/Camera3D" unique_id=1824185556]
 shape = SubResource("SphereShape3D_ntlox")
-exclude_parent = false
 target_position = Vector3(0, 0, -8)
-collision_mask = 4
+collision_mask = 2
