@@ -36,6 +36,7 @@ var display_health := max_health
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/CamContainer/Camera3D
 @onready var crosshair: Panel = $HUD/Crosshair
+@onready var arm: Node3D = $Head/CamContainer/ArmWouldGoHere
 
 @onready var grab_raycast: ShapeCast3D = $Head/CamContainer/Camera3D/GrabRaycast
 @onready var root := get_tree().root
@@ -174,6 +175,26 @@ func _physics_process(delta: float) -> void:
 
 	was_on_floor = is_on_floor()
 	move_and_slide()
+
+func _grab_arc_points(hand_pos: Vector3, object_pos: Vector3, segments: int, height: float) -> PackedVector3Array:
+	var points := PackedVector3Array()
+
+	var mid = (hand_pos + hand_pos) * 0.5
+
+	var dir = (hand_pos - hand_pos).normalized()
+	var up = Vector3.UP
+	var sideways = dir.cross(up).normalized()
+
+	var control = mid + sideways * height
+
+	for i in range(segments + 1):
+		var t = float(i) / segments
+		var a = hand_pos.lerp(control, t)
+		var b = control.lerp(object_pos, t)
+		var point = a.lerp(b, t)
+		points.append(point)
+
+	return points
 
 func _process(_delta: float) -> void:
 	crosshair.position = lerp(crosshair.position, crosshair_position, _delta * 20.0)
