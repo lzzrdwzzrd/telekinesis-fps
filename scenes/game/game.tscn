@@ -1,6 +1,51 @@
 [gd_scene format=3 uid="uid://d3k4u110iaj87"]
 
 [ext_resource type="Script" uid="uid://3st2n1vxrw2f" path="res://scenes/game/game.gd" id="1_sul5r"]
+[ext_resource type="PackedScene" uid="uid://y0ikavk74xtf" path="res://scenes/player/character.tscn" id="2_7h61r"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sul5r"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_7h61r"]
+sky_material = SubResource("ProceduralSkyMaterial_sul5r")
+
+[sub_resource type="Environment" id="Environment_0sr1o"]
+background_mode = 2
+sky = SubResource("Sky_7h61r")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_sul5r"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_7h61r"]
+size = Vector2(30, 30)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_0sr1o"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kelw5"]
+albedo_texture = SubResource("PlaceholderTexture2D_0sr1o")
+uv1_scale = Vector3(30, 30, 30)
+texture_filter = 4
 
 [node name="Game" type="Node3D" unique_id=428618543]
 script = ExtResource("1_sul5r")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=394314858]
+environment = SubResource("Environment_0sr1o")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1111768476]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1945782127]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1840656877]
+shape = SubResource("WorldBoundaryShape3D_sul5r")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=346236926]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("QuadMesh_7h61r")
+surface_material_override/0 = SubResource("StandardMaterial3D_kelw5")
+
+[node name="Character" parent="." unique_id=1491576038 instance=ExtResource("2_7h61r")]
