@@ -47,6 +47,9 @@ var was_on_floor := true
 var current_speed : float = 0.0
 var tangent_speed : float = 0.0
 var air_time := 0.0
+var beam_pull_dir : Vector3
+var arc_h : float
+var beam_tween : Tween
 
 var grab_target : Grabbable3D
 var grabbing := false
@@ -141,10 +144,14 @@ func _physics_process(delta: float) -> void:
 			grab_target = null
 
 	if Input.is_action_just_pressed("grab") and !grabbing and grab_target:
+		grab_target._set_hover_vfx(false)
 		grabbing = true
 		#hold_distance = camera.global_position.distance_to(grab_raycast.get_collision_point()) - 0.5
-		hold_distance = 3.0
+		hold_distance = 2.5
 		grab_target.start_grab(self)
+		if beam_tween: beam_tween.kill()
+		beam_tween = create_tween()
+		beam_tween.tween_method(_set_beam_shader_value, -0.1, 1.0, 0.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 
 	#hold_distance = clamp(hold_distance, min_hold_dist, max_hold_dist)
 
@@ -159,6 +166,7 @@ func _physics_process(delta: float) -> void:
 				var dir = -camera.global_transform.basis.z
 				#grab_target.apply_central_impulse(dir * throw_impulse + get_real_velocity())
 				grab_target.linear_velocity = dir * throw_impulse + get_real_velocity()
+				grab_target.particles(grab_target.linear_velocity)
 		grab_target = null
 
 	if grabbing:
@@ -168,7 +176,7 @@ func _physics_process(delta: float) -> void:
 
 		grab_target.set_grab_target(target_pos, camera.global_transform.basis)
 
-	_handle_beam()
+	_handle_beam(delta)
 
 	fov_mod = clampf(tangent_speed * 4 / base_speed, 0, 5)
 
@@ -178,25 +186,24 @@ func _physics_process(delta: float) -> void:
 	was_on_floor = is_on_floor()
 	move_and_slide()
 
-func _grab_arc_points(hand_pos: Vector3, object_pos: Vector3, segments: int, height: float) -> PackedVector3Array:
+func _grab_arc_points(hand_pos: Vector3, object_pos: Vector3, pull_dir: Vector3, segments: int, curvature: float) -> PackedVector3Array:
 	var points := PackedVector3Array()
 
 	var mid = (hand_pos + object_pos) * 0.5
-	var dir = (object_pos - hand_pos).normalized()
 
-	var up = Vector3.UP
-	if abs(dir.dot(up)) > 0.99:
-		up = Vector3.RIGHT
+	var bend_dir = pull_dir
+	if bend_dir.length_squared() < 0.000001:
+		bend_dir = (object_pos - hand_pos).normalized()
 
-	var sideways = dir.cross(up).normalized()
-	var control = mid + sideways * height
+	bend_dir = bend_dir.normalized()
+
+	var control = mid + bend_dir * curvature
 
 	for i in range(segments + 1):
 		var t = float(i) / segments
 		var a = hand_pos.lerp(control, t)
 		var b = control.lerp(object_pos, t)
-		var point = a.lerp(b, t)
-		points.append(point)
+		points.append(a.lerp(b, t))
 
 	return points
 
@@ -225,13 +232,16 @@ func _frame_from_tangent(tangent: Vector3) -> Basis:
 
 	return Basis(right, normal, tangent)
 
-func _handle_beam(segments := 24, thickness := 0.03) -> void:
+func _handle_beam(delta: float, segments := 24, thickness := 0.04) -> void:
 	if !grabbing or !is_instance_valid(grab_target):
 		grab_beam.visible = false
 		return
 
-	var arc_height := grab_beam.global_position.distance_to(grab_target.global_position) * 0.2
-	var curve_points : PackedVector3Array = _grab_arc_points(Vector3.ZERO, grab_target.global_position - arm.global_position, segments, arc_height)
+	arc_h = lerp(arc_h, absf(grab_target.linear_velocity.length() - grab_target.last_linear_velocity.length()) * 0.8, delta * 0.1)
+	var pull_dir = (grab_target.grab_target_position - grab_target.global_position)
+
+	beam_pull_dir = beam_pull_dir.lerp(pull_dir, 4.0 * delta)
+	var curve_points : PackedVector3Array = _grab_arc_points(Vector3.ZERO, grab_target.global_position - arm.global_position, pull_dir, segments, arc_h)
 
 	var beam : ImmediateMesh = grab_beam.mesh
 	beam.clear_surfaces()
@@ -258,18 +268,10 @@ func _handle_beam(segments := 24, thickness := 0.03) -> void:
 		var new_frame = _transport_frame(frames[i - 1], tangents[i - 1], tangents[i])
 		frames.append(new_frame)
 
-
 	for i in range(curve_points.size()):
 		var p = curve_points[i]
 
-		var tangent: Vector3
-		if i == curve_points.size() - 1:
-			tangent = (curve_points[i] - curve_points[i - 1]).normalized()
-		else:
-			tangent = (curve_points[i + 1] - curve_points[i]).normalized()
-
 		var frame = frames[i]
-
 
 		var ring := []
 		for j in range(radial_segments):
@@ -280,30 +282,52 @@ func _handle_beam(segments := 24, thickness := 0.03) -> void:
 
 		rings.append(ring)
 
-	for i in range(rings.size() - 1):
+	var ring_count = rings.size()
+
+	for i in range(ring_count - 1):
 		var ring_a = rings[i]
 		var ring_b = rings[i + 1]
 
+		var v0 = float(i) / float(ring_count - 1)
+		var v1 = float(i + 1) / float(ring_count - 1)
+
 		for j in range(radial_segments):
 			var next = (j + 1) % radial_segments
+
+			var u0 = float(j) / float(radial_segments)
+			var u1 = float(next) / float(radial_segments)
 
 			var a0 = ring_a[j]
 			var a1 = ring_a[next]
 			var b0 = ring_b[j]
 			var b1 = ring_b[next]
 
+			beam.surface_set_uv(Vector2(u0, v0))
 			beam.surface_add_vertex(a0)
+
+			beam.surface_set_uv(Vector2(u0, v1))
 			beam.surface_add_vertex(b0)
+
+			beam.surface_set_uv(Vector2(u1, v1))
 			beam.surface_add_vertex(b1)
 
+			beam.surface_set_uv(Vector2(u0, v0))
 			beam.surface_add_vertex(a0)
+
+			beam.surface_set_uv(Vector2(u1, v1))
 			beam.surface_add_vertex(b1)
+
+			beam.surface_set_uv(Vector2(u1, v0))
 			beam.surface_add_vertex(a1)
+
 
 	beam.surface_end()
 	grab_beam.mesh = beam
+	grab_beam.global_rotation = Vector3.ZERO # reeeeeal hacky
 	grab_beam.visible = true
 
+func _set_beam_shader_value(value: float):
+	grab_beam.material_override.set_shader_parameter("uv_threshold", value);
 
 func _process(_delta: float) -> void:
 	crosshair.position = lerp(crosshair.position, crosshair_position, _delta * 20.0)

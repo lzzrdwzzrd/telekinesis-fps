@@ -4,12 +4,14 @@ extends RigidBody3D
 @export var mesh : MeshInstance3D
 @export var collision_shape : CollisionShape3D
 @onready var bounds: Node3D = $Bounds # the points are named NNN (Negative X, Negative Y, Negative Z), NNP (-X, -Y, +Z), NPN, NPP, etc.
+@onready var throw_particles: GPUParticles3D = $ThrowParticles
 
 @export var grab_stiffness : float = 20.0
 @export var grab_damping : float = 30.0
 @export var max_grab_force : float = 2000.0
 @export var maintain_upright : bool = false
 @export var upright_torque_strength : float = 10.0
+@export var last_linear_velocity : Vector3
 
 var bounds_hover_tween : Tween
 var is_grabbed : bool = false
@@ -48,7 +50,7 @@ func _position_bounds() -> void:
 	if not collision_shape or not collision_shape.shape:
 		return
 
-	var half_extents = _get_shape_half_extents(collision_shape.shape)
+	var half_extents = _get_shape_half_extents(collision_shape.shape) * collision_shape.scale
 
 	bounds.transform = collision_shape.transform
 
@@ -106,6 +108,10 @@ func stop_grab():
 	grab_anchor = null
 	_set_grab_vfx(false)
 
+func particles(throw_dir: Vector3):
+	$ThrowParticles.look_at(throw_dir)
+	$ThrowParticles.emitting = true
+
 func set_grab_target(pos: Vector3, rot: Basis):
 	grab_target_position = pos
 	grab_target_rotation = rot
@@ -116,6 +122,8 @@ func _physics_process(delta: float) -> void:
 
 	_apply_position_force(delta)
 	_apply_rotation_force(delta)
+
+	last_linear_velocity = linear_velocity
 
 func _apply_position_force(_delta: float) -> void:
 	var displacement = grab_target_position - global_position

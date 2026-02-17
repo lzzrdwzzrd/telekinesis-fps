@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d2sya1udk41su" path="res://scenes/player/character.gd" id="1_0s6rg"]
 [ext_resource type="Shader" uid="uid://8qtuuln5hcq6" path="res://shaders/depth-quad.gdshader" id="2_ntlox"]
+[ext_resource type="Shader" uid="uid://dlfgshmjsxnm7" path="res://shaders/beam.gdshader" id="3_unmdi"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_umfxx"]
 radius = 0.45
@@ -23,10 +24,29 @@ size = Vector2(100, 100)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_ntlox"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ntlox"]
-cull_mode = 2
-shading_mode = 0
-albedo_color = Color(0.18431373, 0.6, 1, 1)
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_unmdi"]
+frequency = 0.0066
+fractal_octaves = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_p42bw"]
+noise = SubResource("FastNoiseLite_unmdi")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_p42bw"]
+render_priority = 2
+shader = ExtResource("3_unmdi")
+shader_parameter/main_color = Color(0.24313726, 0.27058825, 0.98039216, 1)
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_p42bw")
+shader_parameter/emission = Color(0.822, 0.902, 2.989, 1)
+shader_parameter/emission_energy = 2.0
+shader_parameter/scroll_speed = 2.0
+shader_parameter/alpha_threshold = 0.2
+shader_parameter/use_threshold = true
+shader_parameter/invert_boost_direction = false
+shader_parameter/uv_threshold = 1.0
+shader_parameter/margin = 0.1
+shader_parameter/wobble_amplitude = 0.01
+shader_parameter/wobble_speed = 2.0
+shader_parameter/wobble_scale = 3.0
 
 [sub_resource type="ImmediateMesh" id="ImmediateMesh_ntlox"]
 
@@ -55,7 +75,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 [node name="CamContainer" type="Node3D" parent="Head" unique_id=2043748828]
 
 [node name="Camera3D" type="Camera3D" parent="Head/CamContainer" unique_id=1133739601]
-fov = 179.0
 
 [node name="DepthMarkerQuad" type="MeshInstance3D" parent="Head/CamContainer/Camera3D" unique_id=1684351054]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4434595, -4.502241, 22.231209)
@@ -68,9 +87,9 @@ target_position = Vector3(0, 0, -8)
 collision_mask = 4
 
 [node name="ArmWouldGoHere" type="Node3D" parent="Head/CamContainer" unique_id=630571815]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, -1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, -0.5, -0.6)
 
 [node name="GrabBeam" type="MeshInstance3D" parent="Head/CamContainer/ArmWouldGoHere" unique_id=1878004792]
-physics_interpolation_mode = 2
-material_override = SubResource("StandardMaterial3D_ntlox")
+material_override = SubResource("ShaderMaterial_p42bw")
+cast_shadow = 0
 mesh = SubResource("ImmediateMesh_ntlox")
