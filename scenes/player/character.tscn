@@ -23,6 +23,13 @@ size = Vector2(100, 100)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_ntlox"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ntlox"]
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(0.18431373, 0.6, 1, 1)
+
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_ntlox"]
+
 [node name="Character" type="CharacterBody3D" unique_id=1491576038]
 collision_layer = 2
 collision_mask = 9
@@ -61,3 +68,9 @@ target_position = Vector3(0, 0, -8)
 collision_mask = 4
 
 [node name="ArmWouldGoHere" type="Node3D" parent="Head/CamContainer" unique_id=630571815]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, -1, 0)
+
+[node name="GrabBeam" type="MeshInstance3D" parent="Head/CamContainer/ArmWouldGoHere" unique_id=1878004792]
+physics_interpolation_mode = 2
+material_override = SubResource("StandardMaterial3D_ntlox")
+mesh = SubResource("ImmediateMesh_ntlox")
