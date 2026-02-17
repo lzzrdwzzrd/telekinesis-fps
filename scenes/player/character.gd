@@ -54,7 +54,7 @@ var beam_tween : Tween
 var grab_target : Grabbable3D
 var grabbing := false
 
-var crosshair_position : Vector2
+@export var crosshair_position : Vector2
 
 func _ready() -> void:
 	var config := ConfigFile.new()
@@ -90,12 +90,6 @@ func _handle_jumping() -> void:
 		velocity.y += jump_velocity
 
 func _unhandled_input(event : InputEvent) -> void:
-	if event.is_action_pressed("pause"):
-		match Input.mouse_mode:
-			Input.MOUSE_MODE_CAPTURED:
-				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-			Input.MOUSE_MODE_VISIBLE:
-				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		mouse_input.x += event.relative.x * mouse_sensitivity_ratio
 		mouse_input.y += event.relative.y * mouse_sensitivity_ratio

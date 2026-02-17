@@ -12,7 +12,7 @@ config_version=5
 
 config/name="telekinesis-fps"
 config/tags=PackedStringArray("jam_game")
-run/main_scene="uid://d3k4u110iaj87"
+run/main_scene="uid://c7x5dbp5x23hn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -20,7 +20,6 @@ config/icon="res://icon.svg"
 
 window/size/viewport_width=1536
 window/size/viewport_height=864
-window/size/mode=4
 window/stretch/mode="viewport"
 window/vsync/vsync_mode=3
 
