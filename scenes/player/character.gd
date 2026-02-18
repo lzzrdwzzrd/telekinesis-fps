@@ -67,9 +67,9 @@ func _ready() -> void:
 
 func _handle_head_rotation(delta: float) -> void:
 	head.rotation_degrees.y -= mouse_input.x * mouse_sensitivity
-	arm.rotation_degrees.y += mouse_input.x * mouse_sensitivity * 0.08
+	arm.rotation_degrees.y += mouse_input.x * mouse_sensitivity * 0.15
 	head.rotation_degrees.x -= mouse_input.y * mouse_sensitivity
-	arm.rotation_degrees.x += mouse_input.y * mouse_sensitivity * 0.14
+	arm.rotation_degrees.x += mouse_input.y * mouse_sensitivity * 0.30
 
 	mouse_input = Vector2.ZERO
 	head.rotation.x = clamp(head.rotation.x, deg_to_rad(-90), deg_to_rad(90))
@@ -250,7 +250,7 @@ func _handle_beam(delta: float, segments := 24, thickness := 0.04) -> void:
 		grab_beam.visible = false
 		return
 
-	arc_h = lerp(arc_h, absf(grab_target.linear_velocity.length() - grab_target.last_linear_velocity.length()) * 0.8, delta * 0.1)
+	arc_h = lerp(arc_h, absf(grab_target.linear_velocity.length() - grab_target.last_linear_velocity.length()) * 0.8, delta * 0.06)
 	var pull_dir = (grab_target.grab_target_position - grab_target.global_position)
 
 	beam_pull_dir = beam_pull_dir.lerp(pull_dir, 4.0 * delta)
