@@ -7,10 +7,10 @@ uniform float falloff : hint_range(0.0, 1.0) = 0.5;
 uniform int samples : hint_range(0, 64) = 16;
 uniform vec2 center = vec2(0.5, 0.5);
 
-// Vignette controls
 uniform float vignette_strength : hint_range(0.0, 1.0) = 0.4;
 uniform float vignette_radius : hint_range(0.0, 1.5) = 0.75;
 uniform float vignette_softness : hint_range(0.001, 1.0) = 0.45;
+uniform vec3 vignette_color : source_color;
 
 void fragment() {
 	vec2 uv = SCREEN_UV;
@@ -30,7 +30,6 @@ void fragment() {
 
 	color /= float(samples + 1);
 
-	// --- Vignette ---
 	float vignette_dist = distance(uv, center);
 	float vignette = smoothstep(
 		vignette_radius,

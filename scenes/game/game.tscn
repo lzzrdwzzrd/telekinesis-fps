@@ -7,10 +7,14 @@
 [ext_resource type="Script" uid="uid://dvmfpsyspwon3" path="res://scenes/game/pause.gd" id="2_kp23o"]
 [ext_resource type="Shader" uid="uid://dcmq7ccnlf0cj" path="res://shaders/radial.gdshader" id="3_5jirj"]
 [ext_resource type="FontFile" uid="uid://duj8onojj6asa" path="res://fonts/Seymaz-UltraboldCondensed.otf" id="3_kp23o"]
+[ext_resource type="Texture2D" uid="uid://dgmyct4v273ms" path="res://scenes/ui/grabber.png" id="4_ftsea"]
 [ext_resource type="PackedScene" uid="uid://b6fh7ftlq2w4x" path="res://scenes/world/grabbable_3d.tscn" id="4_kelw5"]
+[ext_resource type="Texture2D" uid="uid://cq6sxh7hasalb" path="res://scenes/ui/grabbed.png" id="5_otnwt"]
 [ext_resource type="PackedScene" uid="uid://cj3l61mvpmy8d" path="res://scenes/world/grabbables/rock.tscn" id="6_5i0tg"]
+[ext_resource type="FontFile" uid="uid://ckihdh4j0grij" path="res://fonts/KohSantepheap-Regular.ttf" id="6_otnwt"]
 [ext_resource type="PackedScene" uid="uid://vxdhm25hm2bu" path="res://scenes/world/grabbables/rock_2.tscn" id="7_2a8rs"]
 [ext_resource type="PackedScene" uid="uid://b42okickprssl" path="res://scenes/world/grabbables/rock_3.tscn" id="8_4j704"]
+[ext_resource type="PackedScene" uid="uid://djpq7oopq8hwe" path="res://scenes/game/settings.tscn" id="9_3xj4h"]
 [ext_resource type="PackedScene" uid="uid://c7kqqt0meixj6" path="res://scenes/world/grabbables/rock_4.tscn" id="9_kp23o"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vaxfo"]
@@ -22,12 +26,39 @@ shader_parameter/center = Vector2(0.5, 0.5)
 shader_parameter/vignette_strength = 0.4
 shader_parameter/vignette_radius = 0.75
 shader_parameter/vignette_softness = 0.45
+shader_parameter/vignette_color = Color(0.24313726, 0.27058825, 0.98039216, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vdywr"]
 bg_color = Color(0.24313726, 0.27058825, 0.98039216, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k1na2"]
 bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_otnwt"]
+bg_color = Color(0.24313726, 0.27058825, 0.98039216, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3xj4h"]
+bg_color = Color(0.24313726, 0.27058825, 0.98039216, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5v6r0"]
+content_margin_top = 3.0
+content_margin_bottom = 3.0
+bg_color = Color(1, 1, 1, 1)
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+
+[sub_resource type="FontVariation" id="FontVariation_5jirj"]
+base_font = ExtResource("6_otnwt")
+spacing_glyph = -1
+spacing_space = 1
 
 [sub_resource type="FontVariation" id="FontVariation_vdywr"]
 base_font = ExtResource("2_4j704")
@@ -40,12 +71,20 @@ spacing_bottom = -11
 default_font = SubResource("FontVariation_vdywr")
 Button/colors/font_color = Color(0.24313726, 0.27058825, 0.98039216, 1)
 Button/colors/font_hover_color = Color(0.95, 0.95, 0.95, 1)
-Button/colors/font_hover_pressed_color = Color(0, 1, 0.0333333, 1)
-Button/colors/font_pressed_color = Color(0, 1, 0.03137255, 1)
+Button/colors/font_hover_pressed_color = Color(1, 0.45000005, 0, 1)
+Button/colors/font_pressed_color = Color(1, 0.45000005, 0, 1)
 Button/font_sizes/font_size = 48
 Button/styles/hover = SubResource("StyleBoxFlat_vdywr")
 Button/styles/normal = SubResource("StyleBoxFlat_k1na2")
 Button/styles/pressed = SubResource("StyleBoxFlat_vdywr")
+HSlider/icons/grabber = ExtResource("4_ftsea")
+HSlider/icons/grabber_highlight = ExtResource("5_otnwt")
+HSlider/styles/grabber_area = SubResource("StyleBoxFlat_otnwt")
+HSlider/styles/grabber_area_highlight = SubResource("StyleBoxFlat_3xj4h")
+HSlider/styles/slider = SubResource("StyleBoxFlat_5v6r0")
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/font_sizes/font_size = 20
+Label/fonts/font = SubResource("FontVariation_5jirj")
 
 [sub_resource type="FontVariation" id="FontVariation_vaxfo"]
 base_font = ExtResource("3_kp23o")
@@ -135,7 +174,6 @@ script = ExtResource("1_sul5r")
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1901538481]
 process_mode = 3
 layer = 3
-visible = false
 script = ExtResource("2_kp23o")
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer" unique_id=307408622]
@@ -176,7 +214,7 @@ size_flags_horizontal = 0
 theme_override_fonts/font = SubResource("FontVariation_vaxfo")
 theme_override_font_sizes/font_size = 147
 theme_override_styles/normal = SubResource("StyleBoxFlat_ftsea")
-text = "IMPEDED"
+text = "SUSPENDED"
 
 [node name="Padding" type="Control" parent="CanvasLayer/PauseMenu/VBoxContainer" unique_id=451371301]
 custom_minimum_size = Vector2(0, 100)
@@ -200,6 +238,9 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 0
 text = "SURRENDER"
+
+[node name="Settings" parent="CanvasLayer" unique_id=1472289679 instance=ExtResource("9_3xj4h")]
+visible = false
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=394314858]
 environment = SubResource("Environment_0sr1o")
@@ -262,4 +303,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.042607, 0.5, 4.152344)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.1596265, 0.5, 4.493047)
 
 [connection signal="pressed" from="CanvasLayer/PauseMenu/VBoxContainer/StartButton" to="CanvasLayer" method="_on_start_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/PauseMenu/VBoxContainer/SettingsButton" to="CanvasLayer" method="_on_settings_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/PauseMenu/VBoxContainer/QuitButton" to="CanvasLayer" method="_on_quit_button_pressed"]

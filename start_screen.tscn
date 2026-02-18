@@ -4,6 +4,7 @@
 [ext_resource type="FontFile" uid="uid://duj8onojj6asa" path="res://fonts/Seymaz-UltraboldCondensed.otf" id="2_afy8x"]
 [ext_resource type="FontFile" uid="uid://r28miws75oyd" path="res://fonts/ZT Formom.otf" id="2_k1na2"]
 [ext_resource type="Material" uid="uid://coc4737377k3b" path="res://scenes/world/grabbed-material.tres" id="2_pevhg"]
+[ext_resource type="PackedScene" uid="uid://djpq7oopq8hwe" path="res://scenes/game/settings.tscn" id="4_vdywr"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k1na2"]
 bg_color = Color(0.24313726, 0.27058825, 0.98039216, 1)
@@ -243,6 +244,9 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 0
 text = "CEASE"
+
+[node name="Settings" parent="CanvasLayer" unique_id=1472289679 instance=ExtResource("4_vdywr")]
+visible = false
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=574050245]
 environment = SubResource("Environment_ncxyx")
@@ -496,4 +500,5 @@ transform = Transform3D(0.24, 0, 0, 0, 0.24, 0, 0, 0, 0.24, 0, 0, 0)
 shape = SubResource("ConvexPolygonShape3D_vva36")
 
 [connection signal="pressed" from="CanvasLayer/PauseMenu/VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/PauseMenu/VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/PauseMenu/VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
