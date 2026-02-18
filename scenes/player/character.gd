@@ -36,9 +36,12 @@ var display_health := max_health
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/CamContainer/Camera3D
 @onready var crosshair: Panel = $HUD/Crosshair
-@onready var arm: Node3D = $Head/CamContainer/ArmWouldGoHere
-@onready var grab_beam: MeshInstance3D = $Head/CamContainer/ArmWouldGoHere/GrabBeam
+@onready var arm: Node3D = $Head/CamContainer/Arm
+@onready var grab_beam: MeshInstance3D = $Head/CamContainer/Arm/Armature_002/Skeleton3D/BoneAttachment3D/BeamEmitter/GrabBeam
 @onready var grab_raycast: ShapeCast3D = $Head/CamContainer/Camera3D/GrabRaycast
+@onready var beam_emitter: Marker3D = $Head/CamContainer/Arm/Armature_002/Skeleton3D/BoneAttachment3D/BeamEmitter
+@onready var arm_animator: AnimationTree = $Head/CamContainer/Arm/ArmAnimator
+
 @onready var root := get_tree().root
 
 var mouse_input : Vector2
@@ -62,11 +65,20 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	mouse_sensitivity = config.get_value("conf", "mouse_sensitivity", 0.05)
 
-func _handle_head_rotation() -> void:
+func _handle_head_rotation(delta: float) -> void:
 	head.rotation_degrees.y -= mouse_input.x * mouse_sensitivity
+	arm.rotation_degrees.y += mouse_input.x * mouse_sensitivity * 0.08
 	head.rotation_degrees.x -= mouse_input.y * mouse_sensitivity
+	arm.rotation_degrees.x += mouse_input.y * mouse_sensitivity * 0.14
+
 	mouse_input = Vector2.ZERO
 	head.rotation.x = clamp(head.rotation.x, deg_to_rad(-90), deg_to_rad(90))
+
+	arm.rotation_degrees.y = lerp(arm.rotation_degrees.y, 0.0, 10.0 * delta)
+	arm.rotation_degrees.x = lerp(arm.rotation_degrees.x, 0.0, 10.0 * delta)
+
+	if !is_finite(arm.rotation_degrees.x) or !is_finite(arm.rotation_degrees.y):
+		arm.rotation_degrees = Vector3.ZERO
 
 func _handle_movement(delta: float, input_dir: Vector2) -> void:
 	var rotated_direction := input_dir.rotated(-head.rotation.y)
@@ -140,6 +152,8 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("grab") and !grabbing and grab_target:
 		grab_target._set_hover_vfx(false)
 		grabbing = true
+		var playback : AnimationNodeStateMachinePlayback = arm_animator.get("parameters/playback")
+		playback.travel("Hold")
 		#hold_distance = camera.global_position.distance_to(grab_raycast.get_collision_point()) - 0.5
 		hold_distance = 2.5
 		grab_target.start_grab(self)
@@ -153,14 +167,20 @@ func _physics_process(delta: float) -> void:
 
 	if grabbing and (Input.is_action_just_released("grab") or !is_instance_valid(grab_target) or throw):
 		grabbing = false
+		var playback : AnimationNodeStateMachinePlayback = arm_animator.get("parameters/playback")
 		if is_instance_valid(grab_target):
 			grab_target.stop_grab()
 			grab_target._set_hover_vfx(false)
 			if throw:
+				playback.travel("Idle")
 				var dir = -camera.global_transform.basis.z
 				#grab_target.apply_central_impulse(dir * throw_impulse + get_real_velocity())
 				grab_target.linear_velocity = dir * throw_impulse + get_real_velocity()
 				grab_target.particles(grab_target.linear_velocity)
+			else:
+				playback.travel("DownGentle")
+		else:
+			playback.travel("DownGentle")
 		grab_target = null
 
 	if grabbing:
@@ -205,7 +225,6 @@ func _transport_frame(prev_frame: Basis, prev_tangent: Vector3, new_tangent: Vec
 	var axis = prev_tangent.cross(new_tangent)
 	var dot = prev_tangent.dot(new_tangent)
 
-	# If nearly parallel, keep frame
 	if axis.length_squared() < 0.000001:
 		return prev_frame
 
@@ -235,7 +254,7 @@ func _handle_beam(delta: float, segments := 24, thickness := 0.04) -> void:
 	var pull_dir = (grab_target.grab_target_position - grab_target.global_position)
 
 	beam_pull_dir = beam_pull_dir.lerp(pull_dir, 4.0 * delta)
-	var curve_points : PackedVector3Array = _grab_arc_points(Vector3.ZERO, grab_target.global_position - arm.global_position, pull_dir, segments, arc_h)
+	var curve_points : PackedVector3Array = _grab_arc_points(Vector3.ZERO, grab_target.global_position - beam_emitter.global_position, pull_dir, segments, arc_h)
 
 	var beam : ImmediateMesh = grab_beam.mesh
 	beam.clear_surfaces()
@@ -317,12 +336,12 @@ func _handle_beam(delta: float, segments := 24, thickness := 0.04) -> void:
 
 	beam.surface_end()
 	grab_beam.mesh = beam
-	grab_beam.global_rotation = Vector3.ZERO # reeeeeal hacky
+	grab_beam.global_rotation = Vector3.ZERO  # reeeeeal hacky
 	grab_beam.visible = true
 
 func _set_beam_shader_value(value: float):
 	grab_beam.material_override.set_shader_parameter("uv_threshold", value);
 
-func _process(_delta: float) -> void:
-	crosshair.position = lerp(crosshair.position, crosshair_position, _delta * 20.0)
-	_handle_head_rotation()
+func _process(delta: float) -> void:
+	crosshair.position = lerp(crosshair.position, crosshair_position, delta * 20.0)
+	_handle_head_rotation(delta)

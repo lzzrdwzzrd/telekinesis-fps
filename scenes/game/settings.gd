@@ -36,6 +36,10 @@ func _ready() -> void:
 	var sfx_index := AudioServer.get_bus_index("SFX")
 	AudioServer.set_bus_volume_linear(sfx_index, sfx)
 
+func _process(_delta: float) -> void:
+	if Input.is_action_just_pressed("fullscreen"):
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN if DisplayServer.window_get_mode(0) == DisplayServer.WINDOW_MODE_WINDOWED else DisplayServer.WINDOW_MODE_WINDOWED)
+
 func _on_sens_slider_drag_ended(value_changed: bool) -> void:
 	sensitivity = sens_slider.value
 	var player = get_tree().get_first_node_in_group("player")
