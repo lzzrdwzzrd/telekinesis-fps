@@ -47,6 +47,7 @@ grab_damping = 8.0
 
 [node name="Rock" type="MeshInstance3D" parent="." index="1" unique_id=1129835897]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
+gi_mode = 0
 mesh = SubResource("ArrayMesh_fac0i")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." index="2" unique_id=1269924488]
