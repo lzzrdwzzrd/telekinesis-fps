@@ -44,6 +44,7 @@ mass = 3.0
 mesh = NodePath("Rock")
 collision_shape = NodePath("CollisionShape3D")
 grab_damping = 8.0
+health = 100.0
 
 [node name="Rock" type="MeshInstance3D" parent="." index="1" unique_id=1129835897]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)

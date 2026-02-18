@@ -99,8 +99,10 @@ size = Vector3(0.02, 0.02, 0.02)
 
 [node name="Grabbable3D" type="RigidBody3D" unique_id=1926215540]
 collision_layer = 4
-collision_mask = 15
+collision_mask = 31
 continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 1
 script = ExtResource("1_dv32s")
 
 [node name="Bounds" type="Node3D" parent="." unique_id=264501496]
@@ -173,3 +175,5 @@ fixed_fps = 0
 interpolate = false
 process_material = SubResource("ParticleProcessMaterial_dv32s")
 draw_pass_1 = SubResource("BoxMesh_coavr")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

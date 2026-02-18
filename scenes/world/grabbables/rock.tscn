@@ -45,6 +45,7 @@ mesh = NodePath("Boulder")
 collision_shape = NodePath("CollisionShape3D")
 grab_stiffness = 15.0
 grab_damping = 10.0
+health = 100.0
 
 [node name="Boulder" type="MeshInstance3D" parent="." index="1" unique_id=154444475]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
@@ -54,3 +55,5 @@ mesh = SubResource("ArrayMesh_14jkp")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." index="2" unique_id=1169639616]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 shape = SubResource("ConvexPolygonShape3D_6a6nq")
+
+[node name="DestructParticles" type="GPUParticles3D" parent="." index="4" unique_id=1331124834]

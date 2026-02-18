@@ -12,6 +12,7 @@ extends RigidBody3D
 @export var maintain_upright : bool = false
 @export var upright_torque_strength : float = 10.0
 @export var last_linear_velocity : Vector3
+@export var health := 200.0
 
 var bounds_hover_tween : Tween
 var is_grabbed : bool = false
@@ -19,10 +20,12 @@ var grab_target_position : Vector3
 var grab_target_rotation : Basis
 var grab_anchor : Node3D
 var noise_tween : Tween
-
+var last_hit_time : float
 var original_gravity_scale : float
+var thrown_time : float
 
 const GRABBED_MATERIAL = preload("uid://coc4737377k3b")
+const DAMAGE_NUMBER = preload("uid://doaiejucckexl")
 
 func _ready():
 	_position_bounds()
@@ -109,6 +112,7 @@ func stop_grab():
 	_set_grab_vfx(false)
 
 func particles(throw_dir: Vector3):
+	thrown_time = Time.get_ticks_msec()
 	$ThrowParticles.look_at(throw_dir)
 	$ThrowParticles.emitting = true
 
@@ -150,3 +154,23 @@ func _apply_rotation_force(_delta: float) -> void:
 	var delta_rot = (target * current.inverse()).get_euler()
 	var torque = delta_rot * upright_torque_strength - angular_velocity * 2.0
 	apply_torque(torque)
+
+func _on_body_entered(body: Node) -> void:
+	if body.is_in_group("enemy") and Time.get_ticks_msec() - last_hit_time > 500.0:
+		last_hit_time = Time.get_ticks_msec()
+
+		var velocity := last_linear_velocity.length()
+		var damage : int = (velocity if velocity > 3.0 else 0.0) * mass
+		if Time.get_ticks_msec() - thrown_time < 3000.0:
+			thrown_time = 0.0
+			damage *= 2.0
+
+		var indicator := DAMAGE_NUMBER.instantiate()
+		add_sibling(indicator)
+		indicator.global_position = global_position
+		indicator.action(damage)
+		body.on_damage(damage)
+
+		health -= damage
+		if health <= 0:
+			queue_free()

@@ -109,6 +109,7 @@ func _unhandled_input(event : InputEvent) -> void:
 func on_damage(damage: float) -> void:
 	health -= damage
 	if health <= 0:
+		print("dead")
 		# die
 		pass
 

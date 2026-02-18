@@ -16,6 +16,8 @@
 [ext_resource type="PackedScene" uid="uid://djpq7oopq8hwe" path="res://scenes/game/settings.tscn" id="9_3xj4h"]
 [ext_resource type="PackedScene" uid="uid://c7kqqt0meixj6" path="res://scenes/world/grabbables/rock_4.tscn" id="9_kp23o"]
 [ext_resource type="Texture2D" uid="uid://entspip6fgl2" path="res://scenes/world/map/placeholder.png" id="10_5v6r0"]
+[ext_resource type="LightmapGIData" uid="uid://ddwhw6p7fgfaw" path="res://scenes/game/game.lmbake" id="17_5v6r0"]
+[ext_resource type="PackedScene" uid="uid://vte8jao2k7fv" path="res://scenes/enemies/stone-golem.tscn" id="18_uyinl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vaxfo"]
 shader = ExtResource("3_5jirj")
@@ -112,6 +114,8 @@ sky_material = SubResource("ProceduralSkyMaterial_kelw5")
 background_mode = 1
 sky = SubResource("Sky_lfrn8")
 ambient_light_source = 3
+ambient_light_sky_contribution = 0.49
+ambient_light_energy = 0.0
 reflected_light_source = 2
 tonemap_mode = 3
 tonemap_exposure = 1.32
@@ -119,12 +123,13 @@ tonemap_white = 3.22
 glow_enabled = true
 glow_normalized = true
 glow_bloom = 0.01
-fog_enabled = true
 fog_mode = 1
 fog_light_color = Color(0, 0, 0, 1)
 fog_density = 1.0
 fog_sky_affect = 0.0
 fog_depth_curve = 3.999987
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.0048
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ndy1x"]
 
@@ -461,7 +466,113 @@ mesh = SubResource("ArrayMesh_h2pgo")
 collision_mask = 15
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="AREA/StaticBody3D" unique_id=852536275]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15254211, -0.038715363, -0.00412941)
 shape = SubResource("ConcavePolygonShape3D_s3bhh")
+
+[node name="OmniLight3D3" type="OmniLight3D" parent="." unique_id=2123834160]
+transform = Transform3D(0.9863834, 0, -0.16446231, 0, 1, 0, 0.16446231, 0, 0.9863834, 6.49873, 3.199166, -21.134525)
+light_color = Color(0.19720002, 0.68, 0.33399332, 1)
+light_energy = 2.27
+light_volumetric_fog_energy = 2.426
+light_specular = 0.0
+light_bake_mode = 1
+shadow_enabled = true
+omni_range = 11.885
+omni_attenuation = 0.49
+
+[node name="OmniLight3D8" type="OmniLight3D" parent="." unique_id=2048961481]
+transform = Transform3D(0.99563724, 0, -0.09330901, 0, 1, 0, 0.09330901, 0, 0.99563724, 16.830133, 3.199166, -14.140602)
+light_color = Color(0.19720002, 0.68, 0.33399332, 1)
+light_energy = 2.27
+light_volumetric_fog_energy = 2.426
+light_specular = 0.0
+light_bake_mode = 1
+shadow_enabled = true
+omni_range = 11.885
+omni_attenuation = 0.49
+
+[node name="OmniLight3D4" type="OmniLight3D" parent="." unique_id=936197428]
+transform = Transform3D(0.9859115, 0, 0.16726778, 0, 1, 0, -0.16726778, 0, 0.9859115, -6.27963, 3.199166, 21.417171)
+light_color = Color(0.19720002, 0.68, 0.33399332, 1)
+light_energy = 2.27
+light_volumetric_fog_energy = 2.426
+light_specular = 0.0
+light_bake_mode = 1
+shadow_enabled = true
+omni_range = 11.885
+omni_attenuation = 0.49
+
+[node name="OmniLight3D10" type="OmniLight3D" parent="." unique_id=1137135940]
+transform = Transform3D(0.9859115, 0, 0.16726778, 0, 1, 0, -0.16726778, 0, 0.9859115, -17.38768, 3.199166, 13.981447)
+light_color = Color(0.19720002, 0.68, 0.33399332, 1)
+light_energy = 2.27
+light_volumetric_fog_energy = 2.426
+light_specular = 0.0
+light_bake_mode = 1
+shadow_enabled = true
+omni_range = 11.885
+omni_attenuation = 0.49
+
+[node name="OmniLight3D5" type="OmniLight3D" parent="." unique_id=1896298380]
+transform = Transform3D(0.9859115, 0, 0.16726778, 0, 1, 0, -0.16726778, 0, 0.9859115, 21.171274, 3.199166, 6.101781)
+light_color = Color(0.19720002, 0.68, 0.33399332, 1)
+light_energy = 2.27
+light_volumetric_fog_energy = 2.426
+light_specular = 0.0
+light_bake_mode = 1
+shadow_enabled = true
+omni_range = 11.885
+omni_attenuation = 0.49
+
+[node name="OmniLight3D9" type="OmniLight3D" parent="." unique_id=369668884]
+transform = Transform3D(0.9859115, 0, 0.16726778, 0, 1, 0, -0.16726778, 0, 0.9859115, 13.966629, 3.199166, 17.022701)
+light_color = Color(0.19720002, 0.68, 0.33399332, 1)
+light_energy = 2.27
+light_volumetric_fog_energy = 2.426
+light_specular = 0.0
+light_bake_mode = 1
+shadow_enabled = true
+omni_range = 11.885
+omni_attenuation = 0.49
+
+[node name="OmniLight3D6" type="OmniLight3D" parent="." unique_id=805618533]
+transform = Transform3D(0.9859115, 0, 0.16726778, 0, 1, 0, -0.16726778, 0, 0.9859115, -21.344574, 3.199166, -6.1834908)
+light_color = Color(0.19720002, 0.68, 0.33399332, 1)
+light_energy = 2.27
+light_volumetric_fog_energy = 2.426
+light_specular = 0.0
+light_bake_mode = 1
+shadow_enabled = true
+omni_range = 11.885
+omni_attenuation = 0.49
+
+[node name="OmniLight3D11" type="OmniLight3D" parent="." unique_id=1632053741]
+transform = Transform3D(0.9859115, 0, 0.16726778, 0, 1, 0, -0.16726778, 0, 0.9859115, -14.011366, 3.199166, -17.1145)
+light_color = Color(0.19720002, 0.68, 0.33399332, 1)
+light_energy = 2.27
+light_volumetric_fog_energy = 2.426
+light_specular = 0.0
+light_bake_mode = 1
+shadow_enabled = true
+omni_range = 11.885
+omni_attenuation = 0.49
+
+[node name="CentralDiffuse" type="OmniLight3D" parent="." unique_id=1624654390]
+transform = Transform3D(0.9859115, 0, 0.16726778, 0, 1, 0, -0.16726778, 0, 0.9859115, 0, 24, 0)
+light_color = Color(0.41272, 0.40039998, 0.77, 1)
+light_energy = 1.018
+light_volumetric_fog_energy = 0.0
+light_bake_mode = 1
+omni_range = 33.0
+omni_attenuation = -0.101
+
+[node name="LightmapGI" type="LightmapGI" parent="." unique_id=256427553]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.006592, 0)
+generate_probes_subdiv = 3
+light_data = ExtResource("17_5v6r0")
+
+[node name="StoneGolem" parent="." unique_id=2057808441 instance=ExtResource("18_uyinl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -17)
 
 [connection signal="pressed" from="CanvasLayer/PauseMenu/VBoxContainer/StartButton" to="CanvasLayer" method="_on_start_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/PauseMenu/VBoxContainer/SettingsButton" to="CanvasLayer" method="_on_settings_button_pressed"]
