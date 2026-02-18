@@ -74,8 +74,8 @@ func _handle_head_rotation(delta: float) -> void:
 	mouse_input = Vector2.ZERO
 	head.rotation.x = clamp(head.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
-	arm.rotation_degrees.y = lerp(arm.rotation_degrees.y, 0.0, 10.0 * delta)
-	arm.rotation_degrees.x = lerp(arm.rotation_degrees.x, 0.0, 10.0 * delta)
+	arm.rotation_degrees.y = lerp(arm.rotation_degrees.y, 0.0, 8.0 * delta)
+	arm.rotation_degrees.x = lerp(arm.rotation_degrees.x, 0.0, 8.0 * delta)
 
 	if !is_finite(arm.rotation_degrees.x) or !is_finite(arm.rotation_degrees.y):
 		arm.rotation_degrees = Vector3.ZERO
