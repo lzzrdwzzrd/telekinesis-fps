@@ -1,8 +1,13 @@
 [gd_scene format=4 uid="uid://y0ikavk74xtf"]
 
 [ext_resource type="Script" uid="uid://d2sya1udk41su" path="res://scenes/player/character.gd" id="1_0s6rg"]
+[ext_resource type="Texture2D" uid="uid://dh5voypl46xa0" path="res://scenes/ui/ui-box.png" id="2_ce53v"]
 [ext_resource type="Shader" uid="uid://8qtuuln5hcq6" path="res://shaders/depth-quad.gdshader" id="2_ntlox"]
+[ext_resource type="FontFile" uid="uid://ckihdh4j0grij" path="res://fonts/KohSantepheap-Regular.ttf" id="3_r3yea"]
+[ext_resource type="Texture2D" uid="uid://fnjgq2f8tf77" path="res://scenes/player/hand_Base_color.png" id="3_s4akd"]
 [ext_resource type="Shader" uid="uid://dlfgshmjsxnm7" path="res://shaders/beam.gdshader" id="3_unmdi"]
+[ext_resource type="Texture2D" uid="uid://dvvfyetdn5rws" path="res://scenes/player/hand_Roughness.png" id="4_1u06v"]
+[ext_resource type="Texture2D" uid="uid://dxoai30kwsl0b" path="res://scenes/player/hand_Normal_OpenGL.png" id="4_ce53v"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_umfxx"]
 radius = 0.45
@@ -11,6 +16,70 @@ radius = 0.45
 bg_color = Color(1, 1, 1, 1)
 shadow_color = Color(0, 0, 0, 0.90588236)
 shadow_size = 2
+
+[sub_resource type="FontVariation" id="FontVariation_a78sl"]
+base_font = ExtResource("3_r3yea")
+
+[sub_resource type="Animation" id="Animation_r3yea"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TextureProgressBar:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TextureProgressBar:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.24313726, 0.27058825, 0.98039216, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_a78sl"]
+resource_name = "hurt"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TextureProgressBar:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.23333333),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [Vector2(1.1, 1.1), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TextureProgressBar:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(0.2, 1),
+"update": 0,
+"values": [Color(1.2204381, 0.26295286, 0.15656558, 1), Color(0.24313726, 0.27058825, 0.98039216, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_rtcqn"]
+_data = {
+&"RESET": SubResource("Animation_r3yea"),
+&"hurt": SubResource("Animation_a78sl")
+}
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_unmdi"]
 render_priority = 0
@@ -25,7 +94,15 @@ size = Vector2(100, 100)
 [sub_resource type="SphereShape3D" id="SphereShape3D_ntlox"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_unmdi"]
-albedo_color = Color(0.1736, 0.38612005, 0.56, 1)
+albedo_texture = ExtResource("3_s4akd")
+roughness_texture = ExtResource("4_1u06v")
+normal_enabled = true
+normal_scale = 2.19
+normal_texture = ExtResource("4_ce53v")
+subsurf_scatter_enabled = true
+subsurf_scatter_strength = 0.5
+subsurf_scatter_skin_mode = true
+texture_filter = 4
 use_z_clip_scale = true
 z_clip_scale = 0.6
 fov_override = 70.0
@@ -714,9 +791,178 @@ states/Up/position = Vector2(513.5, 214)
 transitions = ["Start", "Idle", SubResource("AnimationNodeStateMachineTransition_1u06v"), "Idle", "Up", SubResource("AnimationNodeStateMachineTransition_r3yea"), "Up", "Hold", SubResource("AnimationNodeStateMachineTransition_a78sl"), "Up", "Idle", SubResource("AnimationNodeStateMachineTransition_unmdi"), "Hold", "DownGentle", SubResource("AnimationNodeStateMachineTransition_rtcqn"), "DownGentle", "Idle", SubResource("AnimationNodeStateMachineTransition_svjlq"), "Hold", "Idle", SubResource("AnimationNodeStateMachineTransition_p42bw")]
 graph_offset = Vector2(-268, -162)
 
+[sub_resource type="Animation" id="Animation_w1o0g"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Head/CamContainer/Camera3D:fov")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [90.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Head:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 1.6, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Head/CamContainer:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Head/CamContainer/Arm:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Head/CamContainer/Arm:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".:ts")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+
+[sub_resource type="Animation" id="Animation_rtcqn"]
+resource_name = "di"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Head:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.76666665, 0.8666667, 1),
+"transitions": PackedFloat32Array(2, 0.5, 2, 1),
+"update": 0,
+"values": [Vector3(0, 1.6, 0), Vector3(0, 0.3, 0), Vector3(0, 0.4, 0), Vector3(0, 0.30000007, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = false
+tracks/1/path = NodePath("Head:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(),
+"transitions": PackedFloat32Array(),
+"update": 0,
+"values": []
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Head/CamContainer/Arm:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0.855, 0.745, 1.115)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Head/CamContainer/Arm:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-0.09599311, 0.53232545, -1.584759)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Head/CamContainer/Camera3D:fov")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1.6, 4),
+"transitions": PackedFloat32Array(0.5, -2, 1),
+"update": 0,
+"values": [90.0, 149.97862, 100.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Head/CamContainer:rotation")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.6, 0.76666665, 2),
+"transitions": PackedFloat32Array(0.5, 2, 0.1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0.34906584, 0, 0), Vector3(0.034906585, 0, 0), Vector3(1.3962634, 0, 0)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".:ts")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.76666665, 0.8),
+"transitions": PackedFloat32Array(2, 1, 1),
+"update": 0,
+"values": [1.0, 0.6, 1.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_w1o0g"]
+_data = {
+&"RESET": SubResource("Animation_w1o0g"),
+&"di": SubResource("Animation_rtcqn")
+}
+
 [node name="Character" type="CharacterBody3D" unique_id=1491576038 groups=["player"]]
 collision_layer = 2
-collision_mask = 9
+collision_mask = 25
 floor_snap_length = 0.15
 platform_floor_layers = 4294967265
 script = ExtResource("1_0s6rg")
@@ -733,6 +979,51 @@ offset_bottom = 4.0
 pivot_offset = Vector2(2, 2)
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ntlox")
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="HUD" unique_id=958987394]
+modulate = Color(0.24313726, 0.27058825, 0.98039216, 1)
+texture_filter = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 72.0
+offset_top = -72.0
+offset_right = 409.0
+offset_bottom = -46.0
+grow_vertical = 0
+pivot_offset = Vector2(0, 28)
+value = 100.0
+nine_patch_stretch = true
+stretch_margin_left = 24
+stretch_margin_top = 10
+stretch_margin_right = 24
+stretch_margin_bottom = 10
+texture_under = ExtResource("2_ce53v")
+texture_progress = ExtResource("2_ce53v")
+tint_under = Color(0.29586652, 0.2958665, 0.29586646, 1)
+
+[node name="Label" type="Label" parent="HUD/TextureProgressBar" unique_id=301976789]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 9.0
+offset_top = -19.5
+offset_right = 104.0
+offset_bottom = 11.5
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_constants/shadow_outline_size = 2
+theme_override_fonts/font = SubResource("FontVariation_a78sl")
+theme_override_font_sizes/font_size = 20
+text = "HEALTH"
+vertical_alignment = 2
+
+[node name="HealthAnimator" type="AnimationPlayer" parent="HUD" unique_id=380268056]
+libraries/ = SubResource("AnimationLibrary_rtcqn")
 
 [node name="Head" type="Node3D" parent="." unique_id=248946485]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
@@ -778,7 +1069,7 @@ bones/2/parent = 1
 bones/2/rest = Transform3D(0.99992514, -0.0042554755, 0.011473382, 0.00046512275, 0.9501262, 0.31186536, -0.012228295, -0.3118367, 0.950057, 8.4983185e-09, 0.7908881, -1.830142e-08)
 bones/2/enabled = true
 bones/2/position = Vector3(8.4983185e-09, 0.7908881, -1.830142e-08)
-bones/2/rotation = Quaternion(-0.17587875, -0.0034869197, -0.005396396, 0.9843909)
+bones/2/rotation = Quaternion(-0.1926399, 0.006685459, 0.0010274021, 0.9812463)
 bones/2/scale = Vector3(1, 1, 1)
 bones/3/name = "Bone.003"
 bones/3/parent = 2
@@ -792,14 +1083,14 @@ bones/4/parent = 3
 bones/4/rest = Transform3D(0.89845294, -0.3570455, -0.25554034, 0.3963535, 0.90993446, 0.12216064, 0.18890807, -0.2110399, 0.95904946, -2.2351742e-08, 0.2406404, 1.322478e-07)
 bones/4/enabled = true
 bones/4/position = Vector3(-2.2351742e-08, 0.2406404, 1.322478e-07)
-bones/4/rotation = Quaternion(-0.14648964, -0.14379321, 0.16013688, 0.96551573)
+bones/4/rotation = Quaternion(-0.11771361, -0.12615603, 0.15271261, 0.97309154)
 bones/4/scale = Vector3(1, 1, 0.99999994)
 bones/5/name = "Bone.014"
 bones/5/parent = 4
 bones/5/rest = Transform3D(0.9996163, 0.02769645, -0.00029218025, -0.027227517, 0.98064625, -0.19388539, -0.005083412, 0.19381896, 0.9810241, 2.6077032e-08, 0.1589677, -1.07102096e-07)
 bones/5/enabled = true
 bones/5/position = Vector3(2.6077032e-08, 0.1589677, -1.07102096e-07)
-bones/5/rotation = Quaternion(0.15976676, -0.026703896, 0.024255468, 0.9864955)
+bones/5/rotation = Quaternion(0.18215191, 0.011668467, -0.017145384, 0.9830517)
 bones/5/scale = Vector3(1, 0.99999994, 0.99999994)
 bones/6/name = "Bone.021"
 bones/6/parent = 5
@@ -820,14 +1111,14 @@ bones/8/parent = 7
 bones/8/rest = Transform3D(0.99736273, -0.06793122, -0.025550663, 0.06821848, 0.99761474, 0.01054384, 0.024773464, -0.012259063, 0.9996178, 1.7695129e-08, 0.2042574, 2.5960617e-08)
 bones/8/enabled = true
 bones/8/position = Vector3(1.7695129e-08, 0.2042574, 2.5960617e-08)
-bones/8/rotation = Quaternion(-0.043038912, 0.057736352, 0.096782334, 0.9926971)
+bones/8/rotation = Quaternion(-0.02973501, 0.03219079, 0.080231845, 0.99581254)
 bones/8/scale = Vector3(0.99999994, 1, 0.9999999)
 bones/9/name = "Bone.015"
 bones/9/parent = 8
 bones/9/rest = Transform3D(0.999998, -0.00082982914, -0.0018482255, 0.0006945892, 0.99740374, -0.072008, 0.0019031815, 0.07200655, 0.99740237, 4.656613e-10, 0.15258627, 1.7241109e-07)
 bones/9/enabled = true
 bones/9/position = Vector3(4.656613e-10, 0.15258627, 1.7241109e-07)
-bones/9/rotation = Quaternion(-0.040924136, -0.0022709344, -0.0016979589, 0.99915826)
+bones/9/rotation = Quaternion(0.02719206, -0.00028060266, -0.004052754, 0.999622)
 bones/9/scale = Vector3(1, 0.99999994, 1)
 bones/10/name = "Bone.020"
 bones/10/parent = 9
@@ -848,7 +1139,7 @@ bones/12/parent = 11
 bones/12/rest = Transform3D(0.8348339, 0.4662623, 0.29266337, -0.49317083, 0.86967295, 0.02125357, -0.24461162, -0.16207625, 0.95597935, -4.8428774e-08, 0.2197896, -3.213063e-08)
 bones/12/enabled = true
 bones/12/position = Vector3(-4.8428774e-08, 0.2197896, -3.213063e-08)
-bones/12/rotation = Quaternion(-0.16746303, 0.18075849, -0.19781975, 0.94876224)
+bones/12/rotation = Quaternion(-0.19949213, 0.15719983, -0.24092843, 0.9367202)
 bones/12/scale = Vector3(1, 1.0000001, 1)
 bones/13/name = "Bone.016"
 bones/13/parent = 12
@@ -876,7 +1167,7 @@ bones/16/parent = 15
 bones/16/rest = Transform3D(0.6893678, 0.6250111, 0.3662421, -0.61179847, 0.7730408, -0.16766238, -0.387911, -0.108485304, 0.9152902, -2.1606684e-07, 0.27515888, -1.17346644e-07)
 bones/16/enabled = true
 bones/16/position = Vector3(-2.1606684e-07, 0.27515888, -1.17346644e-07)
-bones/16/rotation = Quaternion(-0.074829824, 0.25933552, -0.29562986, 0.916378)
+bones/16/rotation = Quaternion(-0.07160127, 0.26387003, -0.27322346, 0.92227703)
 bones/16/scale = Vector3(1.0000001, 1, 1)
 bones/17/name = "Bone.017"
 bones/17/parent = 16
@@ -904,14 +1195,14 @@ bones/20/parent = 19
 bones/20/rest = Transform3D(0.53543746, -0.84076315, 0.08015149, 0.79690856, 0.4715071, -0.3776478, 0.2797203, 0.26608023, 0.9224737, -2.4959445e-07, 0.25793272, 1.0803342e-07)
 bones/20/enabled = true
 bones/20/position = Vector3(-2.4959445e-07, 0.25793272, 1.0803342e-07)
-bones/20/rotation = Quaternion(0.14017333, -0.11181817, 0.4959026, 0.8496639)
+bones/20/rotation = Quaternion(0.08362486, -0.14102362, 0.5112585, 0.8436433)
 bones/20/scale = Vector3(0.99999994, 1.0000001, 0.99999994)
 bones/21/name = "Bone.009"
 bones/21/parent = 20
 bones/21/rest = Transform3D(0.99475956, -0.096142665, -0.034785647, 0.08989768, 0.9845388, -0.15033847, 0.048701763, 0.14642347, 0.9880224, 2.9802322e-08, 0.26490358, 3.5390258e-08)
 bones/21/enabled = true
 bones/21/position = Vector3(2.9802322e-08, 0.26490358, 3.5390258e-08)
-bones/21/rotation = Quaternion(0.231188, -0.030684583, -0.016273662, 0.97228897)
+bones/21/rotation = Quaternion(0.14571841, -0.087084934, -0.027501905, 0.98510206)
 bones/21/scale = Vector3(1, 0.99999994, 0.99999994)
 bones/22/name = "Bone.022"
 bones/22/parent = 0
@@ -937,7 +1228,7 @@ skin = SubResource("Skin_xuv5s")
 skeleton = NodePath("..")
 
 [node name="BoneAttachment3D" type="BoneAttachment3D" parent="Head/CamContainer/Arm/Armature_002/Skeleton3D" unique_id=1870927410]
-transform = Transform3D(0.99988604, -0.008481894, -0.0124851605, 0.013025345, 0.9028283, 0.4298038, 0.0076264073, -0.42991742, 0.90283597, 0.046967395, 1.7914016, -0.071133666)
+transform = Transform3D(0.99968576, -0.024653943, 0.004513396, 0.01980348, 0.8873433, 0.46068406, -0.015362608, -0.4604499, 0.8875527, 0.046967395, 1.7914016, -0.071133666)
 bone_name = "Bone.002"
 bone_idx = 2
 
@@ -985,3 +1276,6 @@ anim_player = NodePath("../AnimationPlayer")
 parameters/DownGentle/TimeScale/scale = 4.0
 parameters/Hold/TimeScale/scale = 4.0
 parameters/Idle/TimeScale/scale = 2.0
+
+[node name="DeathAnimator" type="AnimationPlayer" parent="." unique_id=560918405]
+libraries/ = SubResource("AnimationLibrary_w1o0g")

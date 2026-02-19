@@ -222,6 +222,11 @@ theme_override_font_sizes/font_size = 147
 theme_override_styles/normal = SubResource("StyleBoxFlat_afy8x")
 text = "IMPERIUM REMOTUM"
 
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/VBoxContainer" unique_id=257769900]
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+text = "!! UNIFINISHED BUILD !!"
+
 [node name="Padding" type="Control" parent="CanvasLayer/PauseMenu/VBoxContainer" unique_id=28509427]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2

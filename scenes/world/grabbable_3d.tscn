@@ -97,7 +97,7 @@ grow_amount = -2.392
 material = SubResource("StandardMaterial3D_3g6by")
 size = Vector3(0.02, 0.02, 0.02)
 
-[node name="Grabbable3D" type="RigidBody3D" unique_id=1926215540]
+[node name="Grabbable3D" type="RigidBody3D" unique_id=1926215540 groups=["throwable"]]
 collision_layer = 4
 collision_mask = 31
 continuous_cd = true
@@ -106,7 +106,6 @@ max_contacts_reported = 1
 script = ExtResource("1_dv32s")
 
 [node name="Bounds" type="Node3D" parent="." unique_id=264501496]
-visible = false
 
 [node name="NNN" type="MeshInstance3D" parent="Bounds" unique_id=16808479]
 transform = Transform3D(-4.371139e-09, 0, -0.1, 0, 0.1, 0, 0.1, 0, -4.371139e-09, -0.5, -0.5, -0.5)
@@ -175,5 +174,7 @@ fixed_fps = 0
 interpolate = false
 process_material = SubResource("ParticleProcessMaterial_dv32s")
 draw_pass_1 = SubResource("BoxMesh_coavr")
+
+[node name="Downwards" type="Node3D" parent="." unique_id=1272540099]
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

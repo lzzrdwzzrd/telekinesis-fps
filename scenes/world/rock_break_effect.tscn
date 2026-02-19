@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://dkbxhbpbqrx42"]
+
+[ext_resource type="Script" uid="uid://ds7pnjtclmuk8" path="res://scenes/world/rock_break_effect.gd" id="1_u56fx"]
+
+[sub_resource type="Curve" id="Curve_2fnov"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_coavr"]
+curve = SubResource("Curve_2fnov")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_u56fx"]
+lifetime_randomness = 0.7
+emission_shape = 1
+emission_sphere_radius = 0.2
+angle_min = -717.5
+angle_max = 717.5
+direction = Vector3(0, 1, 0)
+spread = 170.0
+initial_velocity_min = 2.0
+initial_velocity_max = 4.0
+radial_velocity_min = -2.2351742e-05
+radial_velocity_max = 0.99997765
+scale_min = 2.0
+scale_max = 4.0
+scale_curve = SubResource("CurveTexture_coavr")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wvqmt"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="BoxMesh" id="BoxMesh_2rqpe"]
+material = SubResource("StandardMaterial3D_wvqmt")
+size = Vector3(0.03, 0.03, 0.03)
+
+[node name="RockBreakEffect" type="Node3D" unique_id=2097210292]
+script = ExtResource("1_u56fx")
+
+[node name="BreakParticles" type="GPUParticles3D" parent="." unique_id=491650915]
+emitting = false
+amount = 12
+one_shot = true
+explosiveness = 1.0
+fixed_fps = 0
+interpolate = false
+process_material = SubResource("ParticleProcessMaterial_u56fx")
+draw_pass_1 = SubResource("BoxMesh_2rqpe")

@@ -26,6 +26,7 @@ var thrown_time : float
 
 const GRABBED_MATERIAL = preload("uid://coc4737377k3b")
 const DAMAGE_NUMBER = preload("uid://doaiejucckexl")
+const ROCK_BREAK_EFFECT = preload("uid://dkbxhbpbqrx42")
 
 func _ready():
 	_position_bounds()
@@ -161,6 +162,8 @@ func _on_body_entered(body: Node) -> void:
 
 		var velocity := last_linear_velocity.length()
 		var damage : int = (velocity if velocity > 3.0 else 0.0) * mass
+		if damage <= 2: return
+
 		if Time.get_ticks_msec() - thrown_time < 3000.0:
 			thrown_time = 0.0
 			damage *= 2.0
@@ -173,4 +176,8 @@ func _on_body_entered(body: Node) -> void:
 
 		health -= damage
 		if health <= 0:
+			var particles := ROCK_BREAK_EFFECT.instantiate()
+			add_sibling(particles)
+			particles.global_position = global_position
+
 			queue_free()

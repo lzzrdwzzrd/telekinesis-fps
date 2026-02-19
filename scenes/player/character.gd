@@ -1,6 +1,6 @@
 extends CharacterBody3D
 
-@export var base_speed := 13.0
+@export var base_speed := 10.0
 
 @export var acceleration := 7.0
 @export var slowdown := 15.0
@@ -18,18 +18,13 @@ var display_health := max_health
 @export var accel_mod := 0.0
 @export var hurt_speed_mod := 0.0
 
-@export var target_fov := 90.0:
-	set(value):
-		target_fov = value
-		camera.fov = target_fov + fov_mod
-@export var fov_mod := 0.0:
-	set(value):
-		fov_mod = value
-		camera.fov = target_fov + fov_mod
-
 @export var hold_distance : float = 4.0
 @export var min_hold_dist : float = 1.5
 @export var max_hold_dist : float = 8.0
+
+@export var regen_delay := 4.0
+@export var regen_rate := 2.0
+var time_since_damage := 0.0
 
 @export var throw_impulse : float = 30.0
 
@@ -41,6 +36,8 @@ var display_health := max_health
 @onready var grab_raycast: ShapeCast3D = $Head/CamContainer/Camera3D/GrabRaycast
 @onready var beam_emitter: Marker3D = $Head/CamContainer/Arm/Armature_002/Skeleton3D/BoneAttachment3D/BeamEmitter
 @onready var arm_animator: AnimationTree = $Head/CamContainer/Arm/ArmAnimator
+@onready var healthbar: TextureProgressBar = $HUD/TextureProgressBar
+@onready var health_animator: AnimationPlayer = $HUD/HealthAnimator
 
 @onready var root := get_tree().root
 
@@ -54,10 +51,16 @@ var beam_pull_dir : Vector3
 var arc_h : float
 var beam_tween : Tween
 
+var is_dead := false
+
 var grab_target : Grabbable3D
 var grabbing := false
 
 @export var crosshair_position : Vector2
+@export var ts := 1.0:
+	set(value):
+		Engine.time_scale = value
+		ts = value
 
 func _ready() -> void:
 	var config := ConfigFile.new()
@@ -66,13 +69,14 @@ func _ready() -> void:
 	mouse_sensitivity = config.get_value("conf", "mouse_sensitivity", 0.05)
 
 func _handle_head_rotation(delta: float) -> void:
-	head.rotation_degrees.y -= mouse_input.x * mouse_sensitivity
-	arm.rotation_degrees.y += mouse_input.x * mouse_sensitivity * 0.15
-	head.rotation_degrees.x -= mouse_input.y * mouse_sensitivity
-	arm.rotation_degrees.x += mouse_input.y * mouse_sensitivity * 0.30
+	if !is_dead:
+		head.rotation_degrees.y -= mouse_input.x * mouse_sensitivity
+		arm.rotation_degrees.y += mouse_input.x * mouse_sensitivity * 0.15
+		head.rotation_degrees.x -= mouse_input.y * mouse_sensitivity
+		arm.rotation_degrees.x += mouse_input.y * mouse_sensitivity * 0.30
 
-	mouse_input = Vector2.ZERO
-	head.rotation.x = clamp(head.rotation.x, deg_to_rad(-90), deg_to_rad(90))
+		mouse_input = Vector2.ZERO
+		head.rotation.x = clamp(head.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
 	arm.rotation_degrees.y = lerp(arm.rotation_degrees.y, 0.0, 8.0 * delta)
 	arm.rotation_degrees.x = lerp(arm.rotation_degrees.x, 0.0, 8.0 * delta)
@@ -83,6 +87,9 @@ func _handle_head_rotation(delta: float) -> void:
 func _handle_movement(delta: float, input_dir: Vector2) -> void:
 	var rotated_direction := input_dir.rotated(-head.rotation.y)
 	var direction := Vector3(rotated_direction.x, 0, rotated_direction.y)
+
+	if is_dead:
+		direction = Vector3.ZERO
 
 	var real_speed : float = max(0.0, base_speed + speed_mod + hurt_speed_mod)
 
@@ -98,7 +105,7 @@ func _handle_movement(delta: float, input_dir: Vector2) -> void:
 		velocity.z = lerp(velocity.z, direction.z * real_speed, (acceleration + accel_mod) * delta * in_air_speed_rate)
 
 func _handle_jumping() -> void:
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	if Input.is_action_just_pressed("jump") and is_on_floor() and !is_dead:
 		velocity.y += jump_velocity
 
 func _unhandled_input(event : InputEvent) -> void:
@@ -107,17 +114,34 @@ func _unhandled_input(event : InputEvent) -> void:
 		mouse_input.y += event.relative.y * mouse_sensitivity_ratio
 
 func on_damage(damage: float) -> void:
+	if is_dead: return
+
 	health -= damage
+	time_since_damage = 0.0
+
+	$HUD/HealthAnimator.play("hurt")
 	if health <= 0:
-		print("dead")
-		# die
-		pass
+		is_dead = true
+		get_parent().on_player_dead()
+		$HUD.hide()
+		grab_beam.visible = true
+		if grabbing:
+			grabbing = false
+			var playback : AnimationNodeStateMachinePlayback = arm_animator.get("parameters/playback")
+			if is_instance_valid(grab_target):
+				grab_target.stop_grab()
+				grab_target._set_hover_vfx(false)
+			playback.travel("DownGentle")
+		grab_target = null
+		$DeathAnimator.play("di")
 
 func _physics_process(delta: float) -> void:
-	if display_health != health:
-		display_health = round(lerp(display_health, health, delta * 15.0))
-		#health_progress.value = display_health
-		#health_progress.max_value = max_health
+	if not is_dead and health < max_health:
+		time_since_damage += delta
+
+		if time_since_damage >= regen_delay:
+			health += regen_rate * delta
+			health = min(health, max_health)
 
 	if not is_on_floor() and gravity:
 		velocity.y -= gravity * delta * 1.2
@@ -192,8 +216,6 @@ func _physics_process(delta: float) -> void:
 		grab_target.set_grab_target(target_pos, camera.global_transform.basis)
 
 	_handle_beam(delta)
-
-	fov_mod = clampf(tangent_speed * 4 / base_speed, 0, 5)
 
 	mouse_sensitivity_ratio = float(root.size.x) / float(root.content_scale_size.x)
 	crosshair_position = (Vector2(root.content_scale_size) / 2.0) if !grab_target or grabbing else camera.unproject_position(grab_target.global_position)
@@ -344,5 +366,11 @@ func _set_beam_shader_value(value: float):
 	grab_beam.material_override.set_shader_parameter("uv_threshold", value);
 
 func _process(delta: float) -> void:
+
+	if display_health != health:
+		display_health = round(lerp(display_health, health, delta * 15.0))
+		healthbar.value = display_health
+		healthbar.max_value = max_health
+
 	crosshair.position = lerp(crosshair.position, crosshair_position, delta * 20.0)
 	_handle_head_rotation(delta)
